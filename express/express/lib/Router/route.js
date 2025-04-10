@@ -21,7 +21,9 @@ http_methods.forEach((method) => {
 Route.prototype.dispatch = function (req, res, out) {
   let idx = 0;
 
-  const next = () => {
+  const next = (err) => {
+    // 如果出现错误，直接抛给外层
+    if (err) return out(err);
     if (idx >= this.stack.length) return out();
     const layer = this.stack[idx++];
 

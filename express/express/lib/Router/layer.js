@@ -15,6 +15,14 @@ Layer.prototype.match = function (pathname) {
   return false;
 };
 
+Layer.prototype.handle_error = function (err, req, res, next) {
+  if (this.handler.length === 4) {
+    this.handler(err, req, res, next);
+  } else {
+    next(err);
+  }
+};
+
 Layer.prototype.handle_request = function (req, res, next) {
   this.handler(req, res, next);
 };

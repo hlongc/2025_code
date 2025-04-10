@@ -26,22 +26,39 @@ Router.prototype.handle = function (req, res, out) {
   const reqMethod = req.method.toLowerCase();
   let idx = 0;
 
-  const next = () => {
+  const next = (err) => {
     if (idx >= this.stack.length) return out();
     const layer = this.stack[idx++];
-    // 外层只负责匹配路径，route里层匹配方法
-    if (layer.match(pathname)) {
-      if (!layer.route) {
-        // 如果是中间件，直接执行
-        layer.handle_request(req, res, next);
-      } else if (layer.route.methods[reqMethod]) {
-        // 也就是路由的dispatch方法
-        layer.handle_request(req, res, next);
+    if (err) {
+      // 当前有错误，需要传递给错误处理中间件
+      if (!layer.route && layer.handler.length === 4) {
+        // 函数参数是4个的才是错误处理中间件
+        layer.handle_error(err, req, res, next);
+      } else {
+        // 如果当前不是那么就往下面找
+        next(err);
+      }
+    } else {
+      // 外层只负责匹配路径，route里层匹配方法
+      if (layer.match(pathname)) {
+        if (!layer.route) {
+          // 当前为中间件
+          if (layer.handler.length === 4) {
+            // 如果当前是错误中间件，那么跳过
+            next();
+          } else {
+            // 如果是正常中间件，直接执行
+            layer.handle_request(req, res, next);
+          }
+        } else if (layer.route.methods[reqMethod]) {
+          // 也就是路由的dispatch方法
+          layer.handle_request(req, res, next);
+        } else {
+          next();
+        }
       } else {
         next();
       }
-    } else {
-      next();
     }
   };
 
