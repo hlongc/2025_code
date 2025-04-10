@@ -4,7 +4,15 @@ function Layer(path, handler) {
 }
 
 Layer.prototype.match = function (pathname) {
-  return pathname === this.path;
+  if (pathname === this.path) return true;
+  // 如果当前是中间件，那么需要增加下面的逻辑
+  if (!this.route) {
+    if (this.path === "/") return true;
+    // /hello/world  /hello
+    return pathname.startsWith(this.path + "/");
+  }
+
+  return false;
 };
 
 Layer.prototype.handle_request = function (req, res, next) {

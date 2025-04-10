@@ -17,6 +17,11 @@ http_methods.forEach((method) => {
   };
 });
 
+Application.prototype.use = function () {
+  this.lazy_router();
+  this.router.use(...arguments);
+};
+
 Application.prototype.listen = function (...args) {
   this.lazy_router();
 
