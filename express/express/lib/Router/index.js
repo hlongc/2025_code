@@ -41,6 +41,8 @@ Router.prototype.handle = function (req, res, out) {
     } else {
       // 外层只负责匹配路径，route里层匹配方法
       if (layer.match(pathname)) {
+        req.params = layer.params;
+
         if (!layer.route) {
           // 当前为中间件
           if (layer.handler.length === 4) {
