@@ -1,16 +1,22 @@
+const { http_methods } = require("../common");
 const Layer = require("./layer");
 
 function Route() {
   this.stack = [];
+  /** 记录当前route包含哪些请求方法的handler */
+  this.methods = {};
 }
 
-Route.prototype.get = function (handlers) {
-  handlers.forEach((handler) => {
-    const layer = new Layer("xxxx", handler);
-    layer.method = "get";
-    this.stack.push(layer);
-  });
-};
+http_methods.forEach((method) => {
+  Route.prototype[method] = function (handlers) {
+    handlers.forEach((handler) => {
+      const layer = new Layer("xxxx", handler);
+      layer.method = method;
+      this.methods[layer.method] = true;
+      this.stack.push(layer);
+    });
+  };
+});
 
 Route.prototype.dispatch = function (req, res, out) {
   let idx = 0;
