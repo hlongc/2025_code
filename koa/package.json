@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@koa/bodyparser": "^5.1.1",
     "koa": "^2.16.1"
   }
 }
