@@ -1,4 +1,6 @@
-const Koa = require("koa");
+const Koa = require("./koa");
+const path = require("path");
+const fs = require("fs");
 
 const koa = new Koa();
 
@@ -8,7 +10,8 @@ koa.use(function (ctx, next) {
   console.log(ctx.req.query);
   console.log(ctx.request.req.query);
 
-  ctx.body = "hello";
+  ctx.res.setHeader("Content-Type", "text/plain;charset=utf-8");
+  ctx.body = fs.createReadStream(path.resolve(__dirname, "1.server.js"));
 });
 
 koa.listen(3344, () => {
